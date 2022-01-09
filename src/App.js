@@ -1,25 +1,56 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
 
-function App() {
+import {
+  getCategories,
+  allRestaurants,
+  isExlusiveRestaurants,
+  categoryInfo,
+} from "./api";
+import { Navbar, Card } from "./components";
+
+const App = () => {
+  const [categories, setCategories] = useState([]);
+  const [getAllRestaurants, setGetAllRestaurants] = useState([]);
+  const [isExlusive, setIsExlusive] = useState([]);
+
+  const [getCategory, setGetCategory] = useState("See All");
+  const [categoryInfoState, setCategoryInfoState] = useState([]);
+
+  useEffect(async () => {
+    const data = await categoryInfo(getCategory);
+    setCategoryInfoState(data);
+  }, [getCategory]);
+
+  useEffect(async () => {
+    const categories = await getCategories();
+    setCategories(categories);
+  }, []);
+  useEffect(async () => {
+    const restaurants = await allRestaurants();
+    setGetAllRestaurants(restaurants);
+  }, []);
+  useEffect(async () => {
+    const restaurants = await isExlusiveRestaurants();
+    setIsExlusive(restaurants);
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Navbar
+        categories={categories}
+        className="navbar"
+        setGetCategory={setGetCategory}
+      />
+      <div className="right">
+        {getCategory && <h2>{getCategory}</h2>}
+        <div className="cards">
+          {categoryInfoState.map((data) => {
+            return <Card className="card" data={data} />;
+          })}
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
